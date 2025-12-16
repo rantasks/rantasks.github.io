@@ -54,23 +54,20 @@ function setShuffleVars(card){
 */
 function cssShufflePhase(){
   return new Promise(resolve => {
-    // подготовка vars
-    cards.forEach(setShuffleVars);
-    // force reflow to ensure CSS vars applied
+    cards.forEach(c => {
+      setShuffleVars(c);
+      c.style.setProperty('--dur','1200ms'); // длиннее анимация
+    });
     void cardsRoot.offsetWidth;
-
-    // включаем анимацию у всех карт
     cards.forEach(c => c.classList.add('shuffle-phase'));
 
-    // слушаем конец — используем таймер чуть больше максимальной продолжительности
-    // (безопаснее, чем много слушателей на animationend)
-    const timeout = 1000;
+    const timeout = 1300; // чуть больше длительности
     setTimeout(()=>{
-      // выключаем класс
       cards.forEach(c => c.classList.remove('shuffle-phase'));
       resolve();
     }, timeout);
   });
+}
 }
 
 /* Реальная перестановка — FLIPlike: запоминаем позиции, меняем порядок в DOM,
@@ -124,7 +121,6 @@ function doRealShuffle(){
 */
 function showTaskModal(card){
   return new Promise(resolve => {
-    // overlay
     const overlay = document.createElement('div');
     overlay.className = 'overlay';
 
@@ -133,43 +129,37 @@ function showTaskModal(card){
     modal.innerHTML = `
       <div class="task">${card.dataset.task}</div>
       <div class="row">
-        <button class="btn-ghost" id="cancelBtn">Отменить</button>
-        <button class="btn-confirm" id="confirmBtn">Удалить карту и закрыть</button>
+        <button class="btn-confirm" id="confirmBtn">Удалить и закрыть</button>
       </div>
     `;
-
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
-    // handlers
-    const cancelBtn = modal.querySelector('#cancelBtn');
     const confirmBtn = modal.querySelector('#confirmBtn');
+    confirmBtn.onclick = () => {
+      // Добавляем в историю
+      const li = document.createElement('li');
+      li.textContent = `${historyOl.children.length + 1}. ${card.dataset.task}`;
+      historyOl.prepend(li);
 
-    function close(removeCard){
+      // удаляем карту
+      const idx = cards.indexOf(card);
+      if(idx !== -1) cards.splice(idx,1);
+      card.remove();
+
       overlay.remove();
-      if(removeCard){
-        // добавим в историю
-        const li = document.createElement('li');
-        li.textContent = `${historyOl.children.length + 1}. ${card.dataset.task}`;
-        historyOl.prepend(li); // можно prepend или append — на твой выбор
+      resolve(true);
+    };
 
-        // удалить карту из DOM и из массива cards
-        const idx = cards.indexOf(card);
-        if(idx !== -1) cards.splice(idx, 1);
-        card.remove();
+    overlay.addEventListener('click', e=>{
+      if(e.target === overlay) {
+        overlay.remove();
+        resolve(false);
       }
-      resolve(removeCard);
-    }
-
-    cancelBtn.onclick = () => close(false);
-    confirmBtn.onclick = () => close(true);
-
-    // клик по overlay вне модалки — тоже закрытие (без удаления)
-    overlay.addEventListener('click', e => {
-      if(e.target === overlay) close(false);
     });
   });
 }
+
 
 /* Основная последовательность при клике:
    - сделать 3 фазы cssShufflePhase (видимые перемешивания)
@@ -198,32 +188,13 @@ shuffleBtn.addEventListener('click', async () => {
   const winnerIndex = Math.floor(Math.random() * cards.length);
   const winnerCard = cards[winnerIndex];
 
-  // делаем визуально заметный подъём -> затем показываем модал
-  const inner = winnerCard.querySelector('.card-inner');
-  inner.style.transition = 'transform 420ms cubic-bezier(.22,1,.36,1), box-shadow 320ms';
-  inner.style.transform = 'translateY(-10px) scale(1.03)';
-  inner.style.boxShadow = '0 30px 90px rgba(0,0,0,.7)';
-
-  // чуть задержим, чтобы пользователь увидел подъём
-  await new Promise(r => setTimeout(r, 420));
-
-  // сброс визуального подъёма (чтобы не мешало модалке)
-  inner.style.transform = '';
-  inner.style.boxShadow = '';
-
   // показываем модалку
-  const removed = await showTaskModal(winnerCard);
-
-  // если карту удалили — ничего дополнительно делать (cards уже обновлён)
-  // если НЕ удалили — просто оставляем как есть
-
-  // краткая "ре-рендер" для адаптации сетки: если карта была удалена,
-  // сетка автоматически перетечёт — но приведём к тому же виду.
-  await new Promise(r => setTimeout(r, 120));
+  await showTaskModal(winnerCard);
 
   shuffleBtn.disabled = false;
   isRunning = false;
 });
+
 
 
 
