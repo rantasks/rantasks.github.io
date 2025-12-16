@@ -3,66 +3,97 @@ const shuffleBtn = document.getElementById("shuffleBtn");
 const history = document.getElementById("history");
 const scrollBtn = document.getElementById("scrollBtn");
 
-let available = [...Array(tasks.length).keys()];
+let cards = [];
+let isAnimating = false;
 
-// создаём карточки
+// создание карт
 tasks.forEach((task, i) => {
   const card = document.createElement("div");
   card.className = "card";
+  card.dataset.task = task;
+
   card.innerHTML = `
     <div class="card-inner">
       <div class="card-face front">${i + 1}</div>
       <div class="card-face back">${task}</div>
     </div>
   `;
+
+  cards.push(card);
   cardsContainer.appendChild(card);
 });
 
-shuffleBtn.onclick = () => {
-  if (!available.length) return alert("Задания закончились");
+shuffleBtn.onclick = async () => {
+  if (isAnimating || cards.length === 0) return;
+  isAnimating = true;
 
-  const cards = Array.from(document.querySelectorAll(".card"));
+  // 1️⃣ ВИДИМОЕ ПЕРЕМЕШИВАНИЕ (3 раза)
+  for (let i = 0; i < 3; i++) {
+    await shuffleOnce();
+  }
 
-  // FIRST — запоминаем позиции
-  const first = cards.map(card => card.getBoundingClientRect());
+  // 2️⃣ выбор карты
+  const winnerIndex = Math.floor(Math.random() * cards.length);
+  const winner = cards[winnerIndex];
 
-  // реально перемешиваем порядок
-  cards.sort(() => Math.random() - 0.5);
-  cards.forEach(card => cardsContainer.appendChild(card));
+  // 3️⃣ полноэкранный режим
+  showFullscreen(winner, winnerIndex);
 
-  // LAST — новые позиции
-  const last = cards.map(card => card.getBoundingClientRect());
-
-  // INVERT + PLAY
-  cards.forEach((card, i) => {
-    const dx = first[i].left - last[i].left;
-    const dy = first[i].top - last[i].top;
-
-    card.style.transform = `translate(${dx}px, ${dy}px)`;
-    card.style.transition = "transform 0s";
-
-    requestAnimationFrame(() => {
-      card.style.transition = "transform 700ms cubic-bezier(.22,1,.36,1)";
-      card.style.transform = "";
-    });
-  });
-
-  // выбор победителя
-  const index = available.splice(
-    Math.floor(Math.random() * available.length), 1
-  )[0];
-
-  setTimeout(() => {
-    const winner = document.querySelectorAll(".card")[index];
-    winner.classList.add("flip");
-
-    const li = document.createElement("li");
-    li.textContent = `${history.children.length + 1}. ${tasks[index]}`;
-    history.appendChild(li);
-  }, 800);
+  isAnimating = false;
 };
 
-// прокрутка вниз
+// FLIP shuffle
+function shuffleOnce() {
+  return new Promise(resolve => {
+    const first = cards.map(c => c.getBoundingClientRect());
+
+    cards.sort(() => Math.random() - 0.5);
+    cards.forEach(c => cardsContainer.appendChild(c));
+
+    const last = cards.map(c => c.getBoundingClientRect());
+
+    cards.forEach((card, i) => {
+      const dx = first[i].left - last[i].left;
+      const dy = first[i].top - last[i].top;
+
+      card.style.transform = `translate(${dx}px, ${dy}px)`;
+      card.style.transition = "transform 0s";
+
+      requestAnimationFrame(() => {
+        card.style.transition = "transform 600ms cubic-bezier(.22,1,.36,1)";
+        card.style.transform = "";
+      });
+    });
+
+    setTimeout(resolve, 650);
+  });
+}
+
+// полноэкранная карта
+function showFullscreen(card, index) {
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  document.body.appendChild(overlay);
+
+  card.classList.add("fullscreen", "flip");
+
+  overlay.onclick = () => {
+    // история
+    const li = document.createElement("li");
+    li.textContent = `${history.children.length + 1}. ${card.dataset.task}`;
+    history.appendChild(li);
+
+    // удаляем карту
+    card.remove();
+    cards.splice(index, 1);
+
+    // очистка
+    overlay.remove();
+    card.classList.remove("fullscreen", "flip");
+  };
+}
+
+// прокрутка
 scrollBtn.onclick = () => {
   history.scrollIntoView({ behavior: "smooth" });
 };
