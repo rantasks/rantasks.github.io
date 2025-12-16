@@ -89,8 +89,9 @@ h1{font-size:28px;margin:0 0 6px}
 
 /* класс, который включает анимацию одной фазы */
 .card.shuffle-phase .card-inner{
-  animation: shuffle var(--dur,900ms) var(--delay,0ms) cubic-bezier(.22,1,.36,1) both;
+  animation: shuffle var(--dur,1200ms) var(--delay,0ms) cubic-bezier(.22,1,.36,1) both;
 }
+
 
 /* победитель: полноэкранный вид и переворот */
 .overlay{
@@ -127,6 +128,42 @@ h1{font-size:28px;margin:0 0 6px}
 @media (max-width:720px){
   .card{height:150px}
   .btn{padding:12px 20px}
+}
+/* модалка с результатом — красиво, как карточка */
+.overlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.7);
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal{
+  width: min(900px, 90vw);
+  max-height: 80vh;
+  background: linear-gradient(145deg,#1e1e24,#121216);
+  border-radius: 16px;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px;
+  box-shadow: 0 30px 80px rgba(0,0,0,.7);
+}
+
+.modal .task{
+  font-size: 22px;
+  line-height: 1.4;
+  text-align: center;
+  word-break: break-word;
+}
+
+.modal .row{
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
 }
 
 
