@@ -1,11 +1,11 @@
 :root{
-  --bg: #1e1f29;        /* фон страницы */
-  --card: #f5f5f5;      /* цвет карточек */
+  --bg: #1e1f29;              /* фон страницы */
+  --card: #f5f5f5;            /* основной цвет карточки */
   --card-gradient: linear-gradient(145deg,#ffffff,#e0e0e0);
-  --text: #1a1a1a;      /* цвет текста на карточках */
-  --accent: #d4af37;    /* кнопки и акценты */
-  --muted: #aaaaaa;     /* текст истории */
-  --gap: 32px;           /* отступы между карточками */
+  --text: #1a1a1a;            /* текст на карточке */
+  --accent: #d4af37;          /* кнопки */
+  --muted: #aaaaaa;           /* второстепенный текст */
+  --gap: 32px;                 /* отступы между карточками */
 }
 
 *{box-sizing:border-box}
@@ -38,7 +38,7 @@ h1{font-size:28px;margin:0 0 6px}
 }
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
 
-/* ПОЛЕ КАРТ: сетка с явными отступами */
+/* Сетка карт */
 .cards{
   display:grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -49,12 +49,12 @@ h1{font-size:28px;margin:0 0 6px}
   border-radius:16px;
 }
 
-/* КАРТА */
+/* Карточка */
 .card{
   height: 180px;
   border-radius:18px;
-  perspective:1200px;
-  position:relative;
+  perspective:1200px;           /* важно для flip */
+  position:relative;             /* важно для transform */
   will-change: transform;
   display:block;
 }
@@ -70,15 +70,38 @@ h1{font-size:28px;margin:0 0 6px}
   justify-content:center;
   text-align:center;
   padding:16px;
-  transform-style:preserve-3d;
+  transform-style:preserve-3d;  /* обязательно для flip */
   transition: transform 660ms cubic-bezier(.22,1,.36,1), box-shadow 360ms ease;
   box-shadow: 0 8px 30px rgba(0,0,0,.25);
 }
 
-/* стороны */
-.card-face{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;padding:18px}
-.front{background: var(--card-gradient); color: var(--text); font-size:28px;font-weight:700}
-.back{transform:rotateY(180deg); background: var(--card-gradient); color: var(--text); font-size:15px; line-height:1.45; padding:20px}
+/* Стороны карточки */
+.card-face{
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  backface-visibility:hidden;    /* обязательно для flip */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
+
+.front{
+  background: var(--card-gradient);
+  color: var(--text);
+  font-size:28px;
+  font-weight:700;
+}
+
+.back{
+  transform: rotateY(180deg);
+  background: var(--card-gradient);
+  color: var(--text);
+  font-size:15px;
+  line-height:1.45;
+  padding:20px;
+}
 
 /* ANIMATION: shuffle keyframes */
 @keyframes shuffle {
@@ -87,12 +110,12 @@ h1{font-size:28px;margin:0 0 6px}
   100% { transform: translate3d(0,0,0) rotate(0deg) }
 }
 
-/* класс, который включает анимацию одной фазы */
+/* класс для анимации */
 .card.shuffle-phase .card-inner{
   animation: shuffle var(--dur,1200ms) var(--delay,0ms) cubic-bezier(.22,1,.36,1) both;
 }
 
-/* победитель: полноэкранный вид и модалка */
+/* Полноэкранная модалка */
 .overlay{
   position: fixed;
   inset: 0;
@@ -131,14 +154,25 @@ h1{font-size:28px;margin:0 0 6px}
 
 /* История */
 .history-wrap{margin-top:28px}
-.history{max-width:760px;margin:12px auto 80px;padding-left:18px;color:var(--muted);line-height:1.6}
-.history li{padding:8px 0;border-left:3px solid rgba(212,175,55,.07);padding-left:12px}
+.history{
+  max-width:760px;
+  margin:12px auto 80px;
+  padding-left:18px;
+  color:var(--muted);
+  line-height:1.6;
+}
+.history li{
+  padding:8px 0;
+  border-left:3px solid rgba(212,175,55,.07);
+  padding-left:12px;
+}
 
-/* адаптив */
+/* Адаптив */
 @media (max-width:720px){
   .card{height:150px}
   .btn{padding:12px 20px}
 }
+
 
 
 
