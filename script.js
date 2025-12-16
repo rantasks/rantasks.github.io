@@ -1,11 +1,10 @@
-// script.js
 const cardsRoot = document.getElementById('cards');
 const shuffleBtn = document.getElementById('shuffleBtn');
 const historyOl = document.getElementById('history');
 
 let cards = [];
+let slots = [];
 let isRunning = false;
-let slots = []; // позиции ячеек
 
 function createBoard(){
   cardsRoot.innerHTML = '';
@@ -14,14 +13,18 @@ function createBoard(){
 
   const rect = cardsRoot.getBoundingClientRect();
   const gap = 20;
+  const cardWidth = 180;
+  const count = tasks.length;
+  const totalWidth = cardsRoot.offsetWidth;
+  const startX = (totalWidth - (cardWidth + gap) * count + gap) / 2;
 
-  tasks.forEach((t, i) => {
+  tasks.forEach((t,i)=>{
     const card = document.createElement('div');
-    card.className = 'card';
+    card.className='card';
     card.dataset.task = t;
     card.dataset.idx = i;
 
-    card.innerHTML = `
+    card.innerHTML=`
       <div class="card-inner">
         <div class="card-face front">${i+1}</div>
         <div class="card-face back">${t}</div>
@@ -31,21 +34,13 @@ function createBoard(){
     cards.push(card);
     cardsRoot.appendChild(card);
 
-    // сохраняем слоты
-    const colWidth = (rect.width - gap * (tasks.length-1)) / tasks.length;
-    slots.push({
-      left: i * (colWidth + gap),
-      top: 0
-    });
+    const left = startX + i*(cardWidth + gap);
+    const top = 0;
+    slots.push({left, top});
 
-    card.style.position = 'absolute';
-    card.style.left = `${slots[i].left}px`;
-    card.style.top = `${slots[i].top}px`;
-
-    card.addEventListener('click', async ()=>{
-      if(isRunning) return;
-      await showTaskModal(card);
-    });
+    card.style.position='absolute';
+    card.style.left = `${left}px`;
+    card.style.top = `${top}px`;
   });
 }
 
@@ -53,31 +48,29 @@ createBoard();
 
 function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
 
-function animateCard(card, path, duration){
+function animateCard(card,path,duration){
   return new Promise(resolve=>{
-    let start = null;
-    const startPos = {left: parseFloat(card.style.left), top: parseFloat(card.style.top)};
-    const delta = path.map(p => ({x: p.left - startPos.left, y: p.top - startPos.top}));
-
+    let start=null;
     function step(ts){
-      if(!start) start = ts;
-      const t = (ts-start)/duration;
-      if(t >= 1){
-        card.style.left = `${path[path.length-1].left}px`;
-        card.style.top = `${path[path.length-1].top}px`;
+      if(!start) start=ts;
+      let t = (ts-start)/duration;
+      if(t>=1){
+        const final=path[path.length-1];
+        card.style.left=`${final.left}px`;
+        card.style.top=`${final.top}px`;
         resolve();
         return;
       }
-
-      // вычисляем промежуточную точку через все точки path
-      let seg = Math.floor(t*delta.length);
-      if(seg >= delta.length) seg = delta.length-1;
-      const segT = t*delta.length - seg;
-      const x = startPos.left + delta.slice(0,seg).reduce((a,b)=>a+b.x,0) + delta[seg].x*segT;
-      const y = startPos.top + delta.slice(0,seg).reduce((a,b)=>a+b.y,0) + delta[seg].y*segT;
-      card.style.left = `${x}px`;
-      card.style.top = `${y}px`;
-
+      const segCount = path.length-1;
+      let seg = Math.floor(t*segCount);
+      if(seg>=segCount) seg=segCount-1;
+      const segT = (t*segCount) - seg;
+      const startP=path[seg];
+      const endP=path[seg+1];
+      const x = startP.left + (endP.left - startP.left)*segT;
+      const y = startP.top + (endP.top - startP.top)*segT;
+      card.style.left=`${x}px`;
+      card.style.top=`${y}px`;
       requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -86,48 +79,43 @@ function animateCard(card, path, duration){
 
 async function shuffleCards(){
   if(isRunning) return;
-  isRunning = true;
-  shuffleBtn.disabled = true;
+  if(cards.length===0){ alert('Нет карт'); return; }
+  isRunning=true;
+  shuffleBtn.disabled=true;
 
-  if(cards.length===0){ alert('Нет карт'); isRunning=false; shuffleBtn.disabled=false; return; }
-
-  // генерируем новый порядок случайно
-  const order = [...Array(cards.length).keys()];
+  const order=[...Array(cards.length).keys()];
   for(let i=order.length-1;i>0;i--){
-    const j = Math.floor(Math.random()*(i+1));
-    [order[i], order[j]] = [order[j], order[i]];
+    const j=Math.floor(Math.random()*(i+1));
+    [order[i],order[j]]=[order[j],order[i]];
   }
 
-  // создаём пути для каждой карты через промежуточные точки
-  const maxOffset = 60;
-  const duration = 1000;
-  const animations = [];
+  const totalPhases = 3;
+  for(let phase=0; phase<totalPhases; phase++){
+    const animations=[];
+    cards.forEach((card,i)=>{
+      const targetSlot=slots[order[i]];
+      const midOffset = 50*(phase+1);
+      const mid1={left:(parseFloat(card.style.left)+targetSlot.left)/2, top:-midOffset};
+      const mid2={left:targetSlot.left, top:-midOffset/2};
+      const path=[ {left:parseFloat(card.style.left),top:parseFloat(card.style.top)}, mid1, mid2, targetSlot ];
+      const duration = 500+phase*200;
+      animations.push(animateCard(card,path,duration));
+    });
+    await Promise.all(animations);
+  }
 
-  cards.forEach((card,i)=>{
-    const targetSlot = slots[order[i]];
-    const mid1 = {left: parseFloat(card.style.left), top: parseFloat(card.style.top) - randRange(20,maxOffset)};
-    const mid2 = {left: targetSlot.left, top: targetSlot.top - randRange(20,maxOffset)};
-    animations.push(animateCard(card,[mid1,mid2,targetSlot],duration));
-  });
-
-  await Promise.all(animations);
-
-  // обновляем порядок массива карт по слоту
   cards.sort((a,b)=>order[a.dataset.idx]-order[b.dataset.idx]);
 
-  // выбираем победителя
-  const winnerIndex = Math.floor(Math.random()*cards.length);
-  const winnerCard = cards[winnerIndex];
+  const winnerIndex=Math.floor(Math.random()*cards.length);
+  const winnerCard=cards[winnerIndex];
   winnerCard.classList.add('highlight-long');
   await showTaskModal(winnerCard);
 
-  shuffleBtn.disabled = false;
+  shuffleBtn.disabled=false;
   isRunning=false;
 }
 
-shuffleBtn.addEventListener('click', shuffleCards);
-
-function randRange(min,max){ return Math.random()*(max-min)+min; }
+shuffleBtn.addEventListener('click',shuffleCards);
 
 function showTaskModal(card){
   return new Promise(resolve=>{
@@ -155,12 +143,11 @@ function showTaskModal(card){
       resolve(true);
     };
 
-    overlay.addEventListener('click', e=>{
+    overlay.addEventListener('click',e=>{
       if(e.target===overlay){ overlay.remove(); resolve(false); }
     });
   });
 }
-
 
 
 
