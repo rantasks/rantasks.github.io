@@ -36,12 +36,13 @@ createBoard();
 
 function randRange(min, max){ return Math.random()*(max-min)+min; }
 
+// Генерация сложных кривых для перемешивания
 function setShuffleVars(card){
-  const tx = `${Math.round(randRange(-200,200))}px`;
-  const ty = `${Math.round(randRange(-120,120))}px`;
-  const rot = `${Math.round(randRange(-25,25))}deg`;
-  const scale = randRange(0.9,1.05);
-  const delay = `${Math.round(randRange(0,120))}ms`;
+  const tx = `${randRange(-250,250)}px`;
+  const ty = `${randRange(-150,150)}px`;
+  const rot = `${randRange(-45,45)}deg`;
+  const scale = randRange(0.85,1.1);
+  const delay = `${randRange(0,200)}ms`;
 
   card.style.setProperty('--tx', tx);
   card.style.setProperty('--ty', ty);
@@ -53,11 +54,11 @@ function setShuffleVars(card){
 
 function cssShufflePhase(){
   return new Promise(resolve => {
-    cards.forEach(c=>setShuffleVars(c));
+    cards.forEach(c => setShuffleVars(c));
     void cardsRoot.offsetWidth;
-    cards.forEach(c=>c.classList.add('shuffle-phase'));
+    cards.forEach(c => c.classList.add('shuffle-phase'));
     setTimeout(()=>{
-      cards.forEach(c=>c.classList.remove('shuffle-phase'));
+      cards.forEach(c => c.classList.remove('shuffle-phase'));
       resolve();
     }, 950);
   });
@@ -67,7 +68,7 @@ function doRealShuffle(){
   return new Promise(resolve => {
     const firstRects = cards.map(c => c.getBoundingClientRect());
     cards.sort(()=>Math.random()-0.5);
-    cards.forEach(c=>cardsRoot.appendChild(c));
+    cards.forEach(c => cardsRoot.appendChild(c));
     const lastRects = cards.map(c => c.getBoundingClientRect());
 
     cards.forEach((card,i)=>{
@@ -77,7 +78,7 @@ function doRealShuffle(){
       card.style.transform=`translate(${dx}px,${dy}px)`;
       void card.offsetWidth;
       requestAnimationFrame(()=>{
-        card.style.transition='transform 650ms cubic-bezier(.22,1,.36,1)';
+        card.style.transition='transform 800ms cubic-bezier(.22,1,.36,1)';
         card.style.transform='';
       });
     });
@@ -88,7 +89,7 @@ function doRealShuffle(){
         c.style.transform='';
       });
       resolve();
-    },700);
+    },850);
   });
 }
 
@@ -107,7 +108,9 @@ function showTaskModal(card){
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
+    // выделение выбранной карты на долго
     card.classList.add('highlight');
+    setTimeout(()=> card.classList.add('highlight-long'), 50);
 
     document.getElementById('confirmBtn').onclick=()=>{
       const li=document.createElement('li');
@@ -121,11 +124,12 @@ function showTaskModal(card){
     };
 
     overlay.addEventListener('click', e=>{
-      if(e.target===overlay){ overlay.remove(); resolve(false); }
-    });
-
-    overlay.addEventListener('transitionend',()=>{
-      card.classList.remove('highlight');
+      if(e.target===overlay){ 
+        overlay.remove(); 
+        card.classList.remove('highlight');
+        card.classList.remove('highlight-long');
+        resolve(false); 
+      }
     });
   });
 }
@@ -136,6 +140,7 @@ shuffleBtn.addEventListener('click', async ()=>{
   isRunning=true;
   shuffleBtn.disabled=true;
 
+  // несколько запутанных фаз перемешивания
   await cssShufflePhase();
   await cssShufflePhase();
   await cssShufflePhase();
@@ -148,6 +153,7 @@ shuffleBtn.addEventListener('click', async ()=>{
   shuffleBtn.disabled=false;
   isRunning=false;
 });
+
 
 
 
