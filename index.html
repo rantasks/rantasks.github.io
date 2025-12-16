@@ -420,33 +420,51 @@
                     selectedBall.style.backgroundColor = getRandomColor();
                     selectedBall.style.zIndex = '2';
                 }, 2000);
+                // Плавный скролл к результату (ДОБАВЬТЕ ЭТОТ КОД)
+            setTimeout(() => {
+                result.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center'  // Прокрутит так, чтобы результат был по центру экрана
+                });
+            }, 100); // Небольшая задержка, чтобы конфетти начали падать
             }, 1000);
         }
 
-        // Создать конфетти
-        function createConfetti() {
-            confettiContainer.innerHTML = '';
-            
-            for (let i = 0; i < 150; i++) {
-                const piece = document.createElement('div');
-                piece.className = 'confetti-piece';
-                piece.style.backgroundColor = getRandomColor();
-                piece.style.left = Math.random() * 100 + 'vw';
-                piece.style.width = Math.random() * 15 + 5 + 'px';
-                piece.style.height = Math.random() * 15 + 5 + 'px';
-                piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
-                
-                // Анимация
-                piece.style.animation = `
-                    fall ${Math.random() * 3 + 2}s linear forwards,
-                    spin ${Math.random() * 2 + 1}s linear infinite
-                `;
-                
-                confettiContainer.appendChild(piece);
-                
-                // Удаляем через 3 секунды
-                setTimeout(() => piece.remove(), 3000);
-            }
+// Создать конфетти (ИСПРАВЛЕННАЯ ВЕРСИЯ)
+function createConfetti() {
+    confettiContainer.innerHTML = '';
+    
+    // Убедимся, что контейнер конфетти покрывает ВЕСЬ экран
+    confettiContainer.style.width = '100vw';
+    confettiContainer.style.height = '100vh';
+    confettiContainer.style.left = '0';
+    confettiContainer.style.top = '0';
+    
+    for (let i = 0; i < 150; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.backgroundColor = getRandomColor();
+        // Важное исправление: используем % от ширины окна, а не vw
+        piece.style.left = Math.random() * 100 + '%';
+        piece.style.width = Math.random() * 15 + 5 + 'px';
+        piece.style.height = Math.random() * 15 + 5 + 'px';
+        piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+        
+        // Случайная начальная позиция по вертикали (не только сверху)
+        const startY = Math.random() * 100;
+        piece.style.opacity = '1';
+        piece.style.transform = `translateY(-${startY}px) rotate(0deg)`;
+        
+        // Анимация с задержкой
+        piece.style.animation = `
+            fall ${Math.random() * 3 + 2}s linear ${Math.random() * 0.5}s forwards,
+            spin ${Math.random() * 2 + 1}s linear infinite
+        `;
+        
+        confettiContainer.appendChild(piece);
+        setTimeout(() => piece.remove(), 3500);
+    }
+}
             
             // Добавляем CSS для анимации конфетти
             if (!document.querySelector('#confetti-style')) {
