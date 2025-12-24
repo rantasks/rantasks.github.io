@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ИНТРИГА - Задания</title>
+    <title>ИНТРИГА</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         }
         
         body {
-            background: linear-gradient(45deg, #0f0c29, #302b63, #24243e);
+            background: #0a0a0a;
             height: 100vh;
             overflow: hidden;
             font-family: 'Arial Black', sans-serif;
@@ -21,530 +21,589 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            touch-action: none;
         }
         
         .header {
-            color: white;
-            font-size: 2.5em;
+            color: #ff0066;
+            font-size: 2.8rem;
             text-align: center;
-            margin-bottom: 30px;
-            text-shadow: 0 0 20px #00ffea;
-            letter-spacing: 3px;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.8; }
-            50% { opacity: 1; }
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px #ff0066;
+            letter-spacing: 5px;
+            padding: 10px 30px;
+            border: 3px solid #ff0066;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.8);
         }
         
         .container {
-            width: 90vw;
-            height: 70vh;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 20px;
+            width: 95vw;
+            height: 400px;
+            background: #111111;
+            border-radius: 15px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 255, 234, 0.3);
-            border: 2px solid #00ffea;
+            border: 3px solid #00ccff;
+            box-shadow: 0 0 30px rgba(0, 204, 255, 0.3);
+            margin-bottom: 20px;
         }
         
-        .scroll-track {
+        .scroll-area {
             position: absolute;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 15000px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        
+        .scroll-area::-webkit-scrollbar {
+            display: none;
+        }
+        
+        .track {
             height: 100%;
             display: flex;
             align-items: center;
-            padding: 0 500px;
-            transition: transform 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67);
+            padding: 0 calc(50% - 100px);
+            gap: 30px;
         }
         
         .task-square {
             width: 200px;
             height: 200px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0 25px;
+            flex-shrink: 0;
+            background: linear-gradient(145deg, #1a1a1a, #333333);
             border-radius: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 120px;
             font-weight: 900;
-            color: white;
+            color: #ffffff;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: relative;
-            overflow: hidden;
-            flex-shrink: 0;
+            box-shadow: 
+                0 5px 15px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
         }
         
         .task-square:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 40px #ff00ff;
+            border-color: #ff0066;
         }
         
         .task-square.active {
-            animation: glow 1.5s infinite alternate;
-            border: 4px solid #00ffea;
+            border: 4px solid #00ccff;
+            box-shadow: 
+                0 0 30px #00ccff,
+                inset 0 0 20px rgba(0, 204, 255, 0.2);
+            animation: active-pulse 1s infinite alternate;
         }
         
-        @keyframes glow {
-            from { box-shadow: 0 0 30px #00ffea; }
-            to { box-shadow: 0 0 60px #ff00ff; }
+        @keyframes active-pulse {
+            0% { box-shadow: 0 0 20px #00ccff; }
+            100% { box-shadow: 0 0 40px #00ccff, 0 0 60px rgba(0, 204, 255, 0.3); }
+        }
+        
+        .task-square.special {
+            background: linear-gradient(145deg, #ff0066, #ff3366);
+            animation: special-glow 2s infinite alternate;
+        }
+        
+        @keyframes special-glow {
+            0% { box-shadow: 0 0 20px #ff0066; }
+            100% { box-shadow: 0 0 40px #ff0066, 0 0 60px rgba(255, 0, 102, 0.5); }
         }
         
         .task-number {
             position: relative;
             z-index: 2;
-            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.5);
+            text-shadow: 3px 3px 0 #000;
         }
         
-        .arrow-center {
+        .center-marker {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 100;
-            pointer-events: none;
-        }
-        
-        .arrow {
-            width: 80px;
-            height: 80px;
-            background: #ff00ff;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-            animation: bounce 1s infinite;
-            filter: drop-shadow(0 0 20px #ff00ff);
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .arrow-text {
-            color: white;
-            text-align: center;
-            margin-top: 10px;
-            font-size: 18px;
-            text-shadow: 0 0 10px #ff00ff;
-        }
-        
-        .progress {
-            position: absolute;
-            bottom: 20px;
+            top: 0;
             left: 50%;
             transform: translateX(-50%);
-            color: white;
-            font-size: 24px;
-            text-shadow: 0 0 10px #00ffea;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 30px;
-            border-radius: 50px;
-            border: 2px solid #00ffea;
-        }
-        
-        .particles {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-        
-        .particle {
-            position: absolute;
             width: 4px;
-            height: 4px;
-            background: #00ffea;
-            border-radius: 50%;
-            animation: float 3s infinite;
-        }
-        
-        @keyframes float {
-            0% {
-                transform: translateY(0) translateX(0);
-                opacity: 0;
-            }
-            50% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-100px) translateX(100px);
-                opacity: 0;
-            }
-        }
-        
-        .effects {
-            position: absolute;
-            width: 100%;
             height: 100%;
+            background: linear-gradient(to bottom, transparent, #00ccff, transparent);
             pointer-events: none;
-            overflow: hidden;
+            z-index: 10;
         }
         
-        .flash {
+        .center-marker::before {
+            content: '▼';
             position: absolute;
-            width: 100%;
-            height: 100%;
-            background: white;
-            opacity: 0;
-            pointer-events: none;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ccff;
+            font-size: 24px;
+            text-shadow: 0 0 10px #00ccff;
         }
         
-        .level-indicator {
+        .center-marker::after {
+            content: 'ВЫБРАТЬ';
             position: absolute;
-            top: 20px;
-            right: 20px;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #00ccff;
+            font-size: 18px;
+            white-space: nowrap;
+            text-shadow: 0 0 10px #00ccff;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            font-size: 18px;
+            font-weight: bold;
             color: white;
-            font-size: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 20px;
-            border-radius: 10px;
-            border: 1px solid #ff00ff;
+            background: #222222;
+            border: 2px solid #00ccff;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
-        .mystery-overlay {
+        .btn:hover {
+            background: #00ccff;
+            color: #000;
+            box-shadow: 0 0 20px #00ccff;
+        }
+        
+        .stats {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: white;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: 1px solid #ff0066;
+        }
+        
+        .task-count {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: white;
+            font-size: 18px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: 1px solid #00ccff;
+        }
+        
+        .selection-effect {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: black;
-            display: none;
-            align-items: center;
-            justify-content: center;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            width: 100px;
+            height: 100px;
+            border: 5px solid #00ccff;
+            border-radius: 20px;
+            pointer-events: none;
+            opacity: 0;
             z-index: 1000;
         }
         
-        .mystery-number {
-            font-size: 300px;
-            color: #ff00ff;
-            animation: mysteryGlow 0.5s infinite alternate;
-        }
-        
-        @keyframes mysteryGlow {
-            from { text-shadow: 0 0 50px #ff00ff; }
-            to { text-shadow: 0 0 100px #00ffea, 0 0 150px #ff00ff; }
+        .completion-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff0066;
+            font-size: 80px;
+            text-shadow: 0 0 30px #ff0066;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 1001;
+            text-align: center;
         }
         
         .scroll-hint {
-            position: absolute;
-            bottom: 100px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            animation: hintPulse 2s infinite;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+            margin-top: 15px;
+            text-align: center;
+            animation: hint-blink 2s infinite;
         }
         
-        @keyframes hintPulse {
-            0%, 100% { opacity: 0.3; }
+        @keyframes hint-blink {
+            0%, 100% { opacity: 0.4; }
             50% { opacity: 1; }
+        }
+        
+        .progress-bar {
+            width: 80%;
+            height: 6px;
+            background: #222;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #ff0066, #00ccff);
+            width: 1%;
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                height: 300px;
+            }
+            
+            .task-square {
+                width: 150px;
+                height: 150px;
+                font-size: 80px;
+            }
+            
+            .header {
+                font-size: 2rem;
+                padding: 8px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">⋆⋆⋆ ВЫБЕРИ СВОЮ ИНТРИГУ ⋆⋆⋆</div>
+    <div class="header">⋆ ИНТРИГА ⋆</div>
+    
+    <div class="task-count">Задание: <span id="currentTask">1</span>/<span id="totalTasks">100</span></div>
+    <div class="stats">Уровень: <span id="level">1</span></div>
     
     <div class="container">
-        <div class="effects"></div>
-        <div class="scroll-track" id="scrollTrack">
-            <!-- Квадраты будут сгенерированы через JS -->
+        <div class="center-marker"></div>
+        <div class="scroll-area" id="scrollArea">
+            <div class="track" id="track">
+                <!-- Квадраты будут сгенерированы через JS -->
+            </div>
         </div>
-        
-        <div class="arrow-center">
-            <div class="arrow"></div>
-            <div class="arrow-text">ВЫБРАТЬ</div>
-        </div>
-        
-        <div class="level-indicator">УРОВЕНЬ: <span id="level">1</span></div>
-        <div class="progress">ЗАДАНИЕ: <span id="currentTask">1</span>/100</div>
-        <div class="scroll-hint">← ПРОКРУТИ ДАЛЬШЕ →</div>
     </div>
     
-    <div class="mystery-overlay" id="mysteryOverlay">
-        <div class="mystery-number" id="mysteryNumber">?</div>
+    <div class="controls">
+        <button class="btn" id="prevBtn">← Назад</button>
+        <button class="btn" id="selectBtn">Выбрать</button>
+        <button class="btn" id="nextBtn">Вперед →</button>
     </div>
     
-    <div class="particles" id="particles"></div>
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+    
+    <div class="scroll-hint">Прокручивай ← → чтобы найти все задания</div>
+    
+    <div class="selection-effect" id="selectionEffect"></div>
+    <div class="completion-message" id="completionMessage">!</div>
     
     <script>
-        const scrollTrack = document.getElementById('scrollTrack');
+        // Элементы
+        const track = document.getElementById('track');
+        const scrollArea = document.getElementById('scrollArea');
         const currentTaskEl = document.getElementById('currentTask');
+        const totalTasksEl = document.getElementById('totalTasks');
         const levelEl = document.getElementById('level');
-        const mysteryOverlay = document.getElementById('mysteryOverlay');
-        const mysteryNumber = document.getElementById('mysteryNumber');
-        const effects = document.querySelector('.effects');
+        const progressFill = document.getElementById('progressFill');
+        const selectionEffect = document.getElementById('selectionEffect');
+        const completionMessage = document.getElementById('completionMessage');
         
-        let currentPosition = 0;
+        // Кнопки
+        const prevBtn = document.getElementById('prevBtn');
+        const selectBtn = document.getElementById('selectBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        // Константы
+        const TOTAL_TASKS = 100;
+        const TASK_WIDTH = 200;
+        const TASK_GAP = 30;
+        const SPECIAL_TASKS = [7, 13, 17, 23, 42, 50, 66, 77, 88, 99];
+        
+        // Состояние
         let currentTask = 1;
         let level = 1;
-        let isAnimating = false;
-        let selectedTasks = new Set();
-        
-        // Создаем 100 квадратов с заданиями
-        for (let i = 1; i <= 100; i++) {
-            const square = document.createElement('div');
-            square.className = 'task-square';
-            square.dataset.task = i;
-            
-            // Случайные цвета для квадратов
-            const hue = (i * 3.6) % 360;
-            square.style.background = `linear-gradient(135deg, 
-                hsl(${hue}, 100%, 50%), 
-                hsl(${(hue + 60) % 360}, 100%, 40%))`;
-            
-            // Большая цифра номера задания
-            square.innerHTML = `<div class="task-number">${i}</div>`;
-            
-            // Добавляем секретные эффекты для некоторых заданий
-            if ([7, 13, 42, 66, 77, 99].includes(i)) {
-                square.style.boxShadow = '0 0 50px gold';
-                square.addEventListener('mouseenter', () => {
-                    square.style.transform = 'rotate(360deg) scale(1.1)';
-                    setTimeout(() => {
-                        square.style.transform = '';
-                    }, 300);
-                });
-            }
-            
-            scrollTrack.appendChild(square);
-        }
-        
-        // Создаем частицы
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.animationDelay = Math.random() * 3 + 's';
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        createParticles();
-        
-        // Обработка прокрутки
-        let scrollVelocity = 0;
-        let scrollInertia = 0;
-        
-        container.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            
-            if (isAnimating) return;
-            
-            // Увеличиваем скорость прокрутки
-            scrollVelocity += e.deltaY * 0.5;
-            scrollInertia = Math.abs(e.deltaY);
-            
-            // Прокрутка с инерцией
-            scrollTrack.style.transition = 'none';
-            currentPosition += e.deltaY * 2;
-            
-            // Ограничиваем прокрутку
-            const maxScroll = -13000;
-            currentPosition = Math.max(maxScroll, Math.min(0, currentPosition));
-            
-            scrollTrack.style.transform = `translateX(${currentPosition}px)`;
-            
-            // Вычисляем текущее задание под стрелкой
-            const centerIndex = Math.floor((-currentPosition + 500) / 250);
-            const taskNum = Math.max(1, Math.min(100, centerIndex));
-            
-            if (taskNum !== currentTask) {
-                currentTask = taskNum;
-                currentTaskEl.textContent = taskNum;
-                
-                // Обновляем активный квадрат
-                document.querySelectorAll('.task-square').forEach(sq => {
-                    sq.classList.remove('active');
-                });
-                document.querySelector(`[data-task="${taskNum}"]`).classList.add('active');
-                
-                // Случайное повышение уровня
-                if (Math.random() > 0.95 && !selectedTasks.has(taskNum)) {
-                    level++;
-                    levelEl.textContent = level;
-                    createFlashEffect();
-                }
-            }
-        });
-        
-        // Инерция после прокрутки
-        function applyInertia() {
-            if (scrollInertia > 0) {
-                scrollVelocity *= 0.95;
-                scrollInertia *= 0.95;
-                
-                currentPosition += scrollVelocity;
-                const maxScroll = -13000;
-                currentPosition = Math.max(maxScroll, Math.min(0, currentPosition));
-                
-                scrollTrack.style.transform = `translateX(${currentPosition}px)`;
-                
-                if (Math.abs(scrollVelocity) > 0.1) {
-                    requestAnimationFrame(applyInertia);
-                } else {
-                    scrollTrack.style.transition = 'transform 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
-                }
-            }
-        }
-        
-        setInterval(applyInertia, 16);
-        
-        // Выбор задания по клику на стрелку
-        document.querySelector('.arrow-center').addEventListener('click', () => {
-            if (isAnimating) return;
-            
-            isAnimating = true;
-            selectedTasks.add(currentTask);
-            
-            // Эффект выбора
-            createFlashEffect();
-            
-            // Показываем мистическое число
-            mysteryNumber.textContent = currentTask;
-            mysteryOverlay.style.display = 'flex';
-            
-            // Случайные эффекты для особых заданий
-            if ([13, 42, 66, 77].includes(currentTask)) {
-                mysteryNumber.style.color = 'gold';
-                mysteryNumber.style.fontSize = '400px';
-                document.body.style.animation = 'shake 0.5s';
-                setTimeout(() => {
-                    document.body.style.animation = '';
-                }, 500);
-            }
-            
-            // Скрываем через 1.5 секунды
-            setTimeout(() => {
-                mysteryOverlay.style.display = 'none';
-                isAnimating = false;
-                
-                // Автоматическая прокрутка к следующему заданию
-                if (currentTask < 100) {
-                    const nextTask = Math.min(100, currentTask + 1);
-                    scrollToTask(nextTask);
-                }
-            }, 1500);
-        });
-        
-        // Клик на квадрат
-        document.querySelectorAll('.task-square').forEach(square => {
-            square.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const taskNum = parseInt(square.dataset.task);
-                scrollToTask(taskNum);
-            });
-        });
-        
-        // Плавная прокрутка к заданию
-        function scrollToTask(taskNum) {
-            if (isAnimating) return;
-            
-            isAnimating = true;
-            currentTask = taskNum;
-            currentTaskEl.textContent = taskNum;
-            
-            const targetPosition = -((taskNum - 1) * 250) + 500;
-            currentPosition = targetPosition;
-            
-            scrollTrack.style.transition = 'transform 0.8s cubic-bezier(0.17, 0.67, 0.83, 0.67)';
-            scrollTrack.style.transform = `translateX(${currentPosition}px)`;
-            
-            // Обновляем активный квадрат
-            document.querySelectorAll('.task-square').forEach(sq => {
-                sq.classList.remove('active');
-            });
-            document.querySelector(`[data-task="${taskNum}"]`).classList.add('active');
-            
-            setTimeout(() => {
-                isAnimating = false;
-                scrollTrack.style.transition = '';
-            }, 800);
-        }
-        
-        // Создание эффекта вспышки
-        function createFlashEffect() {
-            const flash = document.createElement('div');
-            flash.className = 'flash';
-            flash.style.animation = 'flash 0.3s';
-            effects.appendChild(flash);
-            
-            setTimeout(() => {
-                effects.removeChild(flash);
-            }, 500);
-            
-            // Создаем взрыв частиц
-            for (let i = 0; i < 20; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                particle.style.width = '10px';
-                particle.style.height = '10px';
-                particle.style.background = `hsl(${Math.random() * 360}, 100%, 60%)`;
-                particle.style.borderRadius = '50%';
-                particle.style.left = '50%';
-                particle.style.top = '50%';
-                particle.style.transform = 'translate(-50%, -50%)';
-                particle.style.animation = `particleExplode ${Math.random() * 0.5 + 0.5}s forwards`;
-                
-                const keyframes = `
-                    @keyframes particleExplode {
-                        0% {
-                            transform: translate(-50%, -50%) scale(1);
-                            opacity: 1;
-                        }
-                        100% {
-                            transform: translate(${Math.random() * 200 - 100}px, ${Math.random() * 200 - 100}px) scale(0);
-                            opacity: 0;
-                        }
-                    }
-                `;
-                
-                const style = document.createElement('style');
-                style.textContent = keyframes;
-                document.head.appendChild(style);
-                
-                effects.appendChild(particle);
-                
-                setTimeout(() => {
-                    if (particle.parentNode) {
-                        effects.removeChild(particle);
-                    }
-                }, 1000);
-            }
-        }
+        let completedTasks = new Set();
+        let isSelecting = false;
         
         // Инициализация
-        scrollToTask(1);
+        function init() {
+            totalTasksEl.textContent = TOTAL_TASKS;
+            
+            // Создаем квадраты заданий
+            for (let i = 1; i <= TOTAL_TASKS; i++) {
+                const square = document.createElement('div');
+                square.className = 'task-square';
+                square.dataset.task = i;
+                
+                if (SPECIAL_TASKS.includes(i)) {
+                    square.classList.add('special');
+                }
+                
+                square.innerHTML = `<div class="task-number">${i}</div>`;
+                
+                // Клик на квадрат
+                square.addEventListener('click', () => {
+                    scrollToTask(i);
+                });
+                
+                track.appendChild(square);
+            }
+            
+            // Устанавливаем начальное положение
+            scrollToTask(1);
+            updateProgress();
+        }
         
-        // Автопрокрутка для демонстрации
-        setTimeout(() => {
-            if (!isAnimating) {
-                const demoTask = Math.floor(Math.random() * 100) + 1;
-                scrollToTask(demoTask);
+        // Прокрутка к заданию
+        function scrollToTask(taskNumber) {
+            if (taskNumber < 1) taskNumber = 1;
+            if (taskNumber > TOTAL_TASKS) taskNumber = TOTAL_TASKS;
+            
+            currentTask = taskNumber;
+            currentTaskEl.textContent = taskNumber;
+            
+            // Вычисляем позицию для прокрутки
+            const scrollPosition = (taskNumber - 1) * (TASK_WIDTH + TASK_GAP) - 
+                                 (scrollArea.clientWidth / 2) + (TASK_WIDTH / 2);
+            
+            // Плавная прокрутка
+            scrollArea.scrollTo({
+                left: scrollPosition,
+                behavior: 'smooth'
+            });
+            
+            // Обновляем активный квадрат
+            updateActiveSquare();
+            updateProgress();
+        }
+        
+        // Обновление активного квадрата
+        function updateActiveSquare() {
+            document.querySelectorAll('.task-square').forEach(square => {
+                square.classList.remove('active');
+            });
+            
+            const activeSquare = document.querySelector(`[data-task="${currentTask}"]`);
+            if (activeSquare) {
+                activeSquare.classList.add('active');
+            }
+        }
+        
+        // Обновление прогресса
+        function updateProgress() {
+            const progress = (completedTasks.size / TOTAL_TASKS) * 100;
+            progressFill.style.width = `${progress}%`;
+        }
+        
+        // Выбор задания
+        function selectTask() {
+            if (isSelecting || completedTasks.has(currentTask)) return;
+            
+            isSelecting = true;
+            completedTasks.add(currentTask);
+            
+            // Эффект выбора
+            selectionEffect.style.opacity = '1';
+            selectionEffect.style.transform = 'translate(-50%, -50%) scale(1)';
+            selectionEffect.style.transition = 'all 0.3s';
+            
+            // Проверка на особое задание
+            if (SPECIAL_TASKS.includes(currentTask)) {
+                level += 2;
+                showCompletionEffect('УРОВЕНЬ ↑↑');
+            } else if (currentTask % 10 === 0) {
+                level += 1;
+                showCompletionEffect('УРОВЕНЬ ↑');
+            } else {
+                showCompletionEffect('✓');
+            }
+            
+            levelEl.textContent = level;
+            
+            // Сброс эффекта
+            setTimeout(() => {
+                selectionEffect.style.opacity = '0';
+                selectionEffect.style.transform = 'translate(-50%, -50%) scale(0)';
+                isSelecting = false;
+                
+                // Автопрокрутка к следующему незавершенному заданию
+                if (completedTasks.size < TOTAL_TASKS) {
+                    let nextTask = currentTask;
+                    while (completedTasks.has(nextTask) && nextTask <= TOTAL_TASKS) {
+                        nextTask++;
+                    }
+                    if (nextTask <= TOTAL_TASKS) {
+                        setTimeout(() => scrollToTask(nextTask), 300);
+                    }
+                } else {
+                    // Все задания выполнены
+                    showCompletionEffect('ПОБЕДА!');
+                }
+            }, 500);
+            
+            updateProgress();
+        }
+        
+        // Показать эффект завершения
+        function showCompletionEffect(text) {
+            completionMessage.textContent = text;
+            completionMessage.style.opacity = '1';
+            completionMessage.style.transition = 'opacity 0.5s';
+            
+            // Разный цвет для разных типов сообщений
+            if (text.includes('УРОВЕНЬ')) {
+                completionMessage.style.color = '#ff0066';
+                completionMessage.style.textShadow = '0 0 30px #ff0066';
+            } else if (text === 'ПОБЕДА!') {
+                completionMessage.style.color = '#00ff00';
+                completionMessage.style.textShadow = '0 0 40px #00ff00';
+            } else {
+                completionMessage.style.color = '#00ccff';
+                completionMessage.style.textShadow = '0 0 30px #00ccff';
+            }
+            
+            setTimeout(() => {
+                completionMessage.style.opacity = '0';
+            }, 1000);
+        }
+        
+        // Обработка скролла
+        let scrollTimeout;
+        scrollArea.addEventListener('scroll', () => {
+            clearTimeout(scrollTimeout);
+            
+            // Обновляем текущее задание на основе положения скролла
+            const scrollLeft = scrollArea.scrollLeft;
+            const centerPosition = scrollLeft + (scrollArea.clientWidth / 2);
+            
+            // Вычисляем номер задания в центре
+            const taskNumber = Math.round(centerPosition / (TASK_WIDTH + TASK_GAP)) + 1;
+            
+            if (taskNumber >= 1 && taskNumber <= TOTAL_TASKS && taskNumber !== currentTask) {
+                currentTask = taskNumber;
+                currentTaskEl.textContent = taskNumber;
+                updateActiveSquare();
+            }
+            
+            // Задержка перед обновлением для плавности
+            scrollTimeout = setTimeout(() => {
+                // Дополнительные проверки для точности
+                updateActiveSquare();
+            }, 100);
+        });
+        
+        // Обработчики кнопок
+        prevBtn.addEventListener('click', () => {
+            scrollToTask(currentTask - 1);
+        });
+        
+        selectBtn.addEventListener('click', () => {
+            selectTask();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            scrollToTask(currentTask + 1);
+        });
+        
+        // Обработка колеса мыши
+        scrollArea.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            // Увеличиваем скорость скролла
+            const scrollSpeed = 2;
+            scrollArea.scrollLeft += e.deltaY * scrollSpeed;
+            
+            // Индикация скролла
+            scrollArea.style.scrollBehavior = 'auto';
+            setTimeout(() => {
+                scrollArea.style.scrollBehavior = 'smooth';
+            }, 50);
+        });
+        
+        // Обработка свайпов на тач-устройствах
+        let touchStartX = 0;
+        let isDragging = false;
+        
+        scrollArea.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            isDragging = true;
+            scrollArea.style.scrollBehavior = 'auto';
+        });
+        
+        scrollArea.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const touchX = e.touches[0].clientX;
+            const diff = touchStartX - touchX;
+            
+            scrollArea.scrollLeft += diff * 1.5;
+            touchStartX = touchX;
+        });
+        
+        scrollArea.addEventListener('touchend', () => {
+            isDragging = false;
+            setTimeout(() => {
+                scrollArea.style.scrollBehavior = 'smooth';
+            }, 100);
+        });
+        
+        // Обработка клавиатуры
+        document.addEventListener('keydown', (e) => {
+            switch(e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    scrollToTask(currentTask - 1);
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    scrollToTask(currentTask + 1);
+                    break;
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    selectTask();
+                    break;
+            }
+        });
+        
+        // Инициализация при загрузке
+        window.addEventListener('DOMContentLoaded', init);
+        
+        // Случайное подмигивание особых заданий
+        setInterval(() => {
+            const randomSpecial = SPECIAL_TASKS[Math.floor(Math.random() * SPECIAL_TASKS.length)];
+            const specialSquare = document.querySelector(`[data-task="${randomSpecial}"]`);
+            
+            if (specialSquare && !completedTasks.has(randomSpecial)) {
+                specialSquare.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    specialSquare.style.transform = '';
+                }, 300);
             }
         }, 3000);
-        
-        // Добавляем CSS для анимации вспышки
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes flash {
-                0% { opacity: 0; }
-                50% { opacity: 0.7; }
-                100% { opacity: 0; }
-            }
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                25% { transform: translateX(-10px); }
-                75% { transform: translateX(10px); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
